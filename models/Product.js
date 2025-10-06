@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const extraFeeSchema = new mongoose.Schema({
   icon: { type: String },
@@ -69,5 +69,4 @@ productSchema.set("toJSON", { virtuals: true });
 productSchema.set("toObject", { virtuals: true });
 
 const Product = mongoose.model("Product", productSchema);
-
-export default Product;
+module.exports = Product;
