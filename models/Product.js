@@ -1,73 +1,29 @@
-import mongoose from "mongoose";
+const express = require("express");
+const Product = require("../models/Product");
 
-const extraFeeSchema = new mongoose.Schema({
-  icon: { type: String },
-  text: { type: String },
+const router = express.Router();
+
+// ✅ GET all products
+router.get("/", async (req, res) => {
+  try {
+    const products = await Product.find().populate("category");
+    res.status(200).json(products);
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
-const specificationSchema = new mongoose.Schema({}, { strict: false });
-
-const faqItemSchema = new mongoose.Schema({
-  q: { type: String, required: true },
-  a: { type: String, required: true },
+// ✅ GET single product by ID
+router.get("/:id", async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id).populate("category");
+    if (!product) return res.status(404).json({ message: "Product not found" });
+    res.json(product);
+  } catch (error) {
+    console.error("Error fetching product:", error);
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
-const faqCategorySchema = new mongoose.Schema({
-  category: { type: String, required: true },
-  items: [faqItemSchema],
-});
-
-const termsSchema = new mongoose.Schema({}, { strict: false });
-
-const productSchema = new mongoose.Schema(
-  {
-    // Basic Info
-    name: { type: String, required: true, trim: true },
-    slug: { type: String, required: true, unique: true, lowercase: true, trim: true },
-    category: { type: String, required: true, trim: true },
-    category_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Category",
-      required: true,
-    },
-    description: { type: String },
-    price: { type: Number, required: true },
-    discount_price: { type: Number },
-    stock: { type: Number, default: 0 },
-    status: { type: String, enum: ["active", "inactive"], default: "active" },
-    currency: { type: String, default: "kr" },
-    unit: { type: String, default: "/st" },
-
-    // 🖼 Product Images
-    productImage: { type: String },
-    euClassificationImage: { type: String },
-
-    // Product Details
-    details: { type: String },
-    extraFees: [extraFeeSchema],
-    sections: [{ type: String }],
-
-    // Specifications
-    specifications: specificationSchema,
-
-    // FAQs
-    faqs: [faqCategorySchema],
-
-    // Terms
-    terms: termsSchema,
-  },
-  { timestamps: true }
-);
-
-// ✅ Virtual field for formatted price
-productSchema.virtual("formattedPrice").get(function () {
-  return `${this.price} ${this.currency}${this.unit}`;
-});
-
-// ✅ Include virtuals in JSON
-productSchema.set("toJSON", { virtuals: true });
-productSchema.set("toObject", { virtuals: true });
-
-const Product = mongoose.model("Product", productSchema);
-
-export default Product;
+module.exports = router;

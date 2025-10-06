@@ -1,10 +1,29 @@
-const express = require("express");
-const router = express.Router();
-const Product = require("../models/Product");
+import express from "express";
+import Product from "../models/Product.js";
 
-router.get("/:id", async (req, res) => {
-  const product = await Product.findById(req.params.id).populate("category");
-  res.json(product);
+const router = express.Router();
+
+// ✅ GET all products
+router.get("/", async (req, res) => {
+  try {
+    const products = await Product.find().populate("category");
+    res.status(200).json(products);
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
-module.exports = router;
+// ✅ GET single product by ID or slug
+router.get("/:id", async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id).populate("category");
+    if (!product) return res.status(404).json({ message: "Product not found" });
+    res.json(product);
+  } catch (error) {
+    console.error("Error fetching product:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+export default router;
