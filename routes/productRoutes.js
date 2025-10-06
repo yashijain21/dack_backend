@@ -20,10 +20,7 @@ router.get("/", async (req, res) => {
 // ✅ GET single product by ID
 router.get("/:id", async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id).populate({
-      path: "category",
-      strictPopulate: false, // safe even if category is missing
-    });
+  const product = await Product.findById(req.params.id).populate("category_id");
 
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
