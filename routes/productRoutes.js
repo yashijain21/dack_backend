@@ -6,7 +6,10 @@ const router = express.Router();
 // ✅ GET all products
 router.get("/", async (req, res) => {
   try {
-    const products = await Product.find().populate("category");
+    const products = await Product.find().populate({
+      path: "category",
+      strictPopulate: false, // prevents crash if category missing
+    });
     res.status(200).json(products);
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -16,20 +19,27 @@ router.get("/", async (req, res) => {
 
 // ✅ GET single product by ID
 router.get("/:id", async (req, res) => {
-  const { id } = req.params;
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({ message: "Invalid product ID" });
-  }
-
   try {
-    const product = await Product.findById(id).populate("category");
-    if (!product) return res.status(404).json({ message: "Product not found" });
+    const product = await Product.findById(req.params.id).populate({
+      path: "category",
+      strictPopulate: false, // safe even if category is missing
+    });
 
-    res.json(product);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.status(200).json(product);
   } catch (error) {
     console.error("Error fetching product:", error);
+
+    // Check if ID format is invalid
+    if (error.kind === "ObjectId") {
+      return res.status(400).json({ message: "Invalid product ID" });
+    }
+
     res.status(500).json({ message: "Server error" });
   }
 });
+
 module.exports = router;
