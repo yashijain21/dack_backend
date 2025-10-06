@@ -1,5 +1,5 @@
-import express from "express";
-import Product from "../models/Product.js";
+const express = require("express");
+const Product = require("../models/Product");
 
 const router = express.Router();
 
@@ -14,7 +14,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// ✅ GET single product by ID or slug
+// ✅ GET single product by ID
 router.get("/:id", async (req, res) => {
   try {
     const product = await Product.findById(req.params.id).populate("category");
@@ -26,4 +26,4 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-export default router;
+module.exports = router;
