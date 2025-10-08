@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const appointmentSchema = new mongoose.Schema(
   {
@@ -42,4 +42,4 @@ const appointmentSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("Appointment", appointmentSchema);
+module.exports = mongoose.model("Appointment", appointmentSchema);

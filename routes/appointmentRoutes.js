@@ -1,5 +1,5 @@
-import express from "express";
-import Appointment from "../models/Appointment.js";
+const express = require("express");
+const Appointment = require("../models/Appointment");
 
 const router = express.Router();
 
@@ -46,4 +46,4 @@ router.get("/", async (req, res) => {
   }
 });
 
-export default router;
+module.exports = router;
